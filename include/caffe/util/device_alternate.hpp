@@ -1,6 +1,8 @@
 #ifndef CAFFE_UTIL_DEVICE_ALTERNATE_H_
 #define CAFFE_UTIL_DEVICE_ALTERNATE_H_
 
+#define CPU_ONLY 1
+
 #ifdef CPU_ONLY  // CPU-only Caffe.
 
 #include <vector>
@@ -78,8 +80,8 @@ void classname<Dtype>::funcname##_##gpu(const vector<Blob<Dtype>*>& top, \
 namespace caffe {
 
 // CUDA: library error reporting.
-const char* cublasGetErrorString(cublasStatus_t error);
-const char* curandGetErrorString(curandStatus_t error);
+// const char* cublasGetErrorString(cublasStatus_t error);
+// const char* curandGetErrorString(curandStatus_t error);
 
 // CUDA: use 512 threads per block
 const int CAFFE_CUDA_NUM_THREADS = 512;
