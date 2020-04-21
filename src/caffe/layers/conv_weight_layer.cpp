@@ -17,7 +17,7 @@ namespace caffe {
                          const vector<Blob<Dtype>*>& top){
         CHECK(bottom[0]->shape()[1] == bottom[1]->shape()[1] && bottom[0]->shape()[2] == bottom[1]->shape()[2] && bottom[0]->shape()[3] == bottom[1]->shape()[3])
         << "Size Not Match";
-        top[0]->Reshape({bottom[1]->shape()[0]});
+        top[0]->Reshape({1, bottom[1]->shape()[2], 1, 1});
     }
 
     template<typename Dtype>
