@@ -11,11 +11,16 @@ namespace caffe {
         CHECK(bottom.size() == 2)
         << "no weight forwarding";
 
-        const ConvolutionWeightParameter& convolutionweigh_param = this->layer_param_.convolutionweight_param();
-        kernel_channel_ = convolutionweigh_param.kernel_c();
-        kernel_height_ = convolutionweigh_param.kernel_h();
-        kernel_width_ = convolutionweigh_param.kernel_w();
-        kernel_num_ = convolutionweigh_param.kernel_n();
+        ConvolutionWeightParameter cw_param = this->layer_param_.convolutionweight_param();
+        kernel_channel_ = cw_param.kernel_c();
+        kernel_height_ = cw_param.kernel_h();
+        kernel_width_ = cw_param.kernel_w();
+        kernel_num_ = cw_param.kernel_n();
+
+//        kernel_channel_ = 512;
+//        kernel_height_ = 4;
+//        kernel_width_ = 4;
+//        kernel_num_ = 20;
     }
 
     template<typename Dtype>
@@ -31,7 +36,9 @@ namespace caffe {
 
         bottom_buffer_.Reshape(bottom_shape);
         bottom_buffer_conv_.Reshape(bottom_shape_conv);
-        top[0]->Reshape({1, this->kernel_num_, 1, 1});
+        top[0]->Reshape({1, kernel_num_, 1, 1});
+
+        conv_offset_ = bottom_buffer_.count();
     }
 
     template<typename Dtype>
@@ -47,11 +54,23 @@ namespace caffe {
         bottom_data_conv = bottom_buffer_conv_.cpu_data();
 
         Dtype* top_data = top[0]->mutable_cpu_data();
-        const int count = top[0]->shape()[1];
+        const int count = top[0]->count();
 
+        for(int i = 0; i < 20; i++){
+            LOG(ERROR)<<bottom_data[i];
+        }
+        LOG(ERROR)<<"-------------------------";
+        for(int i = 0; i < 20; i++){
+            LOG(ERROR)<<bottom_data_conv[i];
+        }
+        LOG(ERROR)<<"-------------------------";
+
+        LOG(ERROR)<<"Hello World";
         for (int i = 0; i < count; ++i) {
-            caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, 1, 1, bottom[0]->shape()[2],
-                                  (Dtype)1., bottom_data + 1, bottom_data_conv + 1,
+            LOG(ERROR)<<conv_offset_;
+
+            caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, 1, 1, conv_offset_,
+                                  (Dtype)1., bottom_data_conv + conv_offset_, bottom_data,
                                   (Dtype)0., top_data + 1);
         }
     }

@@ -383,7 +383,7 @@ message LayerParameter {
   optional ContrastiveLossParameter contrastive_loss_param = 105;
   optional ConvolutionParameter convolution_param = 106;
 
-  optional ConvolutionWeightParameter convolutionweight_param = 201;
+  optional ConvolutionWeightParameter convolutionweight_param = 149;
 
   optional CropParameter crop_param = 144;
   optional DataParameter data_param = 107;
@@ -646,10 +646,10 @@ message ConvolutionParameter {
 }
 
 message ConvolutionWeightParameter {
-  optional uint32 kernel_h = 3;
-  optional uint32 kernel_w = 1;
-  optional uint32 kernel_c = 15;
-  optional uint32 kernel_n = 23;
+  optional int32 kernel_h = 1;
+  optional int32 kernel_w = 2;
+  optional int32 kernel_c = 3;
+  optional int32 kernel_n = 4;
 }
 
 message CropParameter {
@@ -1326,7 +1326,8 @@ message V1LayerParameter {
   optional ConcatParameter concat_param = 9;
   optional ContrastiveLossParameter contrastive_loss_param = 40;
   optional ConvolutionParameter convolution_param = 10;
-  optional ConvolutionWeightParameter convolutionweight_param = 201;
+
+  optional ConvolutionWeightParameter convolutionweight_param = 43;
 
   optional DataParameter data_param = 11;
   optional DropoutParameter dropout_param = 12;
