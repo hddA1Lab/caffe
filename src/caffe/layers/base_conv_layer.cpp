@@ -231,7 +231,18 @@ void BaseConvolutionLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   // overly large memory usage. In the special case of 1x1 convolution
   // it goes lazily unused to save memory.
   col_buffer_shape_.clear();
-  col_buffer_shape_.push_back(kernel_dim_ * group_);
+//    LOG(ERROR) << col_buffer_shape_[0];
+//    LOG(ERROR) << col_buffer_shape_[1];
+//    LOG(ERROR) << col_buffer_shape_[2];
+//    LOG(ERROR) << col_buffer_shape_[3];
+//    LOG(ERROR)<<"-------------------------";
+
+    col_buffer_shape_.push_back(kernel_dim_ * group_);
+//    LOG(ERROR) << col_buffer_shape_[0];
+//    LOG(ERROR) << col_buffer_shape_[1];
+//    LOG(ERROR) << col_buffer_shape_[2];
+//    LOG(ERROR) << col_buffer_shape_[3];
+//    LOG(ERROR)<<"-------------------------";
   for (int i = 0; i < num_spatial_axes_; ++i) {
     if (reverse_dimensions()) {
       col_buffer_shape_.push_back(input_shape(i + 1));
@@ -239,6 +250,11 @@ void BaseConvolutionLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       col_buffer_shape_.push_back(output_shape_[i]);
     }
   }
+//    LOG(ERROR) << col_buffer_shape_[0];
+//    LOG(ERROR) << col_buffer_shape_[1];
+//    LOG(ERROR) << col_buffer_shape_[2];
+//    LOG(ERROR) << col_buffer_shape_[3];
+//    LOG(ERROR)<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
   col_buffer_.Reshape(col_buffer_shape_);
   bottom_dim_ = bottom[0]->count(channel_axis_);
   top_dim_ = top[0]->count(channel_axis_);

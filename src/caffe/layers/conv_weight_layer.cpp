@@ -34,8 +34,8 @@ namespace caffe {
         CHECK(bottom_shape[1] == bottom_shape_conv[1] && bottom_shape[2] == bottom_shape_conv[2] && bottom_shape[3] == bottom_shape_conv[3])
         << "Size Not Match";
 
-        bottom_buffer_.Reshape(bottom_shape);
-        bottom_buffer_conv_.Reshape(bottom_shape_conv);
+        bottom_buffer_.Reshape({1, 1, kernel_width_ * kernel_height_ * kernel_channel_, 1});
+        bottom_buffer_conv_.Reshape({kernel_num_, 1, 1, kernel_width_ * kernel_height_ * kernel_channel_});
         top[0]->Reshape({1, kernel_num_, 1, 1});
 
         conv_offset_ = bottom_buffer_.count();
@@ -56,22 +56,10 @@ namespace caffe {
         Dtype* top_data = top[0]->mutable_cpu_data();
         const int count = top[0]->count();
 
-        for(int i = 0; i < 20; i++){
-            LOG(ERROR)<<bottom_data[i];
-        }
-        LOG(ERROR)<<"-------------------------";
-        for(int i = 0; i < 20; i++){
-            LOG(ERROR)<<bottom_data_conv[i];
-        }
-        LOG(ERROR)<<"-------------------------";
-
-        LOG(ERROR)<<"Hello World";
         for (int i = 0; i < count; ++i) {
-            LOG(ERROR)<<conv_offset_;
-
-            caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, 1, 1, conv_offset_,
-                                  (Dtype)1., bottom_data_conv + conv_offset_, bottom_data,
-                                  (Dtype)0., top_data + 1);
+            caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, 1, 1, conv_offset_,
+                                  (Dtype)1., &bottom_data_conv[i], bottom_data,
+                                  (Dtype)0., &top_data[i]);
         }
     }
 
