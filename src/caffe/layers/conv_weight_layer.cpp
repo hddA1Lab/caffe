@@ -16,11 +16,6 @@ namespace caffe {
         kernel_height_ = cw_param.kernel_h();
         kernel_width_ = cw_param.kernel_w();
         kernel_num_ = cw_param.kernel_n();
-
-//        kernel_channel_ = 512;
-//        kernel_height_ = 4;
-//        kernel_width_ = 4;
-//        kernel_num_ = 20;
     }
 
     template<typename Dtype>
@@ -34,10 +29,10 @@ namespace caffe {
         CHECK(bottom_shape[1] == bottom_shape_conv[1] && bottom_shape[2] == bottom_shape_conv[2] && bottom_shape[3] == bottom_shape_conv[3])
         << "Size Not Match";
 
-        bottom_buffer_.Reshape({1, 1, kernel_width_ * kernel_height_ * kernel_channel_, 1});
-        bottom_buffer_conv_.Reshape({kernel_num_, 1, 1, kernel_width_ * kernel_height_ * kernel_channel_});
-        top[0]->Reshape({1, kernel_num_, 1, 1});
+        bottom_buffer_.Reshape(bottom_shape);
+        bottom_buffer_conv_.Reshape(bottom_shape_conv);
 
+        top[0]->Reshape({1, kernel_num_, 1, 1});
         conv_offset_ = bottom_buffer_.count();
     }
 
@@ -47,19 +42,23 @@ namespace caffe {
         const Dtype* bottom_data = bottom[0]->cpu_data();
         const Dtype* bottom_data_conv = bottom[1]->cpu_data();
 
+        Dtype* top_data = top[0]->mutable_cpu_data();
+        const int count = top[0]->count();
+
         cwim2col_cpu(bottom_data, bottom_buffer_.mutable_cpu_data());
-        cwim2col_cpu(bottom_data_conv, bottom_buffer_conv_.mutable_cpu_data());
+        for (int i = 0; i < count; i++){
+            cwim2col_cpu(bottom_data_conv + conv_offset_ * i, bottom_buffer_conv_.mutable_cpu_data() + conv_offset_ * i);
+        }
 
         bottom_data = bottom_buffer_.cpu_data();
         bottom_data_conv = bottom_buffer_conv_.cpu_data();
 
-        Dtype* top_data = top[0]->mutable_cpu_data();
-        const int count = top[0]->count();
-
+        // bottom_data_conv + conv_offset_ * i
+        // &bottom_data_conv[i]
         for (int i = 0; i < count; ++i) {
             caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, 1, 1, conv_offset_,
-                                  (Dtype)1., &bottom_data_conv[i], bottom_data,
-                                  (Dtype)0., &top_data[i]);
+                                  (Dtype)1., bottom_data_conv + conv_offset_ * i, bottom_data,
+                                  (Dtype)0., top_data + i);
         }
     }
 
